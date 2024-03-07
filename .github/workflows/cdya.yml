@@ -26,10 +26,10 @@ jobs:
       needs: [build-and-push-yc]
       steps:
         - name: Deploy serverless container
-        uses: yc-actions/yc-sls-container-deploy@v1
-        with:
-          yc-sa-json-credentials: ${{ secrets.YC_KEYS }}
-          container-name: ${{ secrets.YC_CONTAINER_NAME}}
-          folder-id: ${{ secrets.YC_FOLDER_ID }}
-          revision-image-url: cr.yandex/${{ secrets.YC_REGISTRY_ID }}
-          revision-serivce-account-id: ${{ secrets.YC_SA_ID}}
+          uses: yc-actions/yc-sls-container-deploy@v1
+          with:
+            yc-sa-json-credentials: ${{ secrets.YC_KEYS }}
+            container-name: ${{ secrets.YC_CONTAINER_NAME}}
+            folder-id: ${{ secrets.YC_FOLDER_ID }}
+            revision-image-url: cr.yandex/${{ secrets.YC_REGISTRY_ID }}
+            revision-serivce-account-id: ${{ secrets.YC_SA_ID}}

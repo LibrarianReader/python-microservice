@@ -1,0 +1,59 @@
+version: '3.7'
+
+services:
+  anime_service:
+    build: ./anime-service
+    command: >
+      sh -c "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 && pytest /app/tests"
+
+    volumes:
+      - ./anime-service/:/app/
+    ports:
+      - 8001:8000
+    environment:
+      - DATABASE_URI=postgresql://anime_db_username:anime_db_password@anime_db/anime_db_dev
+      - CAST_SERVICE_HOST_URL=http://cast_service:8000/api/v1/casts/
+
+  anime_db:
+    image: postgres:12.1-alpine
+    volumes:
+      - postgres_data_anime:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=anime_db_username
+      - POSTGRES_PASSWORD=anime_db_password
+      - POSTGRES_DB=anime_db_dev
+
+  cast_service:
+    build: ./cast-service
+    command: >
+      sh -c "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 && pytest /app/tests"
+      
+    volumes:
+      - ./cast-service/:/app/
+    ports:
+      - 8002:8000
+    environment:
+      - DATABASE_URI=postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev
+
+  cast_db:
+    image: postgres:12.1-alpine
+    volumes:
+      - postgres_data_cast:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=cast_db_username
+      - POSTGRES_PASSWORD=cast_db_password
+      - POSTGRES_DB=cast_db_dev
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx_config.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - cast_service
+      - anime_service
+
+volumes:
+  postgres_data_anime:
+  postgres_data_cast:
